@@ -341,12 +341,12 @@ void JpegCodec::variableLenghtHuffmanCoding(int *input, int size, BitDataBuilder
     }
 }
 
-void JpegCodec::writeJpegToFile(const char *filename, const std::pair<std::vector<int>, int> &data)
+void JpegCodec::writeJpegToFile(const char *filename, const std::pair<std::vector<int>, int> &data, int width, int height)
 {
     std::ofstream out(filename, std::ios_base::out | std::ios_base::binary);
     out << char(0xff) << char(0xd8); // SOI
     out << char(0xff) << char(0xe0); // APP
-    out << char(0x00) << char(0x10) << char(0x00); // app payload section
+    out << char(0x00) << char(0x10);// app payload section
 
     // payload - jfif header
     out << char(0x4A) << char(0x46) << char(0x49) << char(0x46) << char(0x00) << char(0x01) << char(0x01)
@@ -362,8 +362,8 @@ void JpegCodec::writeJpegToFile(const char *filename, const std::pair<std::vecto
     out << char(0xff) << char(0xc0); // SOF
     out << char(0x00) << char(0x0b);
     out << char(0x08); // 8bit sample
-    out << char(0x00) << char(0x08); // height
-    out << char(0x00) << char(0x08); // width
+    out << char(0x00) << char(0x10); // height
+    out << char(0x00) << char(0x10); // width
     out << char(0x01); // only gray channel
     out << char(0x01) << char(0x11) << char(0x00); // gray channel data*/
 
@@ -415,17 +415,20 @@ void JpegCodec::writeJpegToFile(const char *filename, const std::pair<std::vecto
 
     const int diff = ceil((data.second - (data.first.size() - 1) * sizeof(int) * 8) / 8.0);
     const int intData = data.first[data.first.size() - 1];
-    const unsigned char tailMask = (1 << (8 - data.second % 8)) - 1;
+    const unsigned char tailMask = data.second % 8 == 0 ? 0 : (1 << (8 - data.second % 8)) - 1;
 
     for (int i = 0; i < diff; ++i) {
         char c[sizeof(int)];
         memcpy(c, &intData, sizeof(int));
 
         char v = c[sizeof(int) - i - 1];
+
         if (i + 1 == diff)
             v |= tailMask;
-
         out << v;
+
+        if (v == char(0xff))
+            out << char(0x00);
     }
 
     out << char(0xff) << char(0xd9);

@@ -12,7 +12,7 @@ public:
     JpegCodec();
 
     static std::pair<std::vector<int>, int> encode(const Bitmap &bmp);
-    static void writeJpegToFile(const char *filename, const std::pair<std::vector<int>, int> &data);
+    static void writeJpegToFile(const char *filename, const std::pair<std::vector<int>, int> &data, int width, int height);
 
 private:
     static void dct(char *data, int width, int height, BitDataBuilder &builder);
