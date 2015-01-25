@@ -362,8 +362,8 @@ void JpegCodec::writeJpegToFile(const char *filename, const std::pair<std::vecto
     out << char(0xff) << char(0xc0); // SOF
     out << char(0x00) << char(0x0b);
     out << char(0x08); // 8bit sample
-    out << char(0x00) << char(0x10); // height
-    out << char(0x00) << char(0x10); // width
+    out << char(0x00) << char(height); // height
+    out << char(0x00) << char(width); // width
     out << char(0x01); // only gray channel
     out << char(0x01) << char(0x11) << char(0x00); // gray channel data*/
 

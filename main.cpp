@@ -21,7 +21,10 @@ void printData(const std::vector<int> &data)
 
 int main()
 {
-    Bitmap b(16, 16);
+    const int w = 8;
+    const int h = 16;
+
+    Bitmap b(w, h);
     for (int i = 0; i < b.height(); ++i) {
         for (int j = 0; j < b.width(); ++j) {
             if (~(i + j) & 1) {
@@ -31,7 +34,7 @@ int main()
     }
 
     std::pair<std::vector<int>, int> data = JpegCodec::encode(b);
-    JpegCodec::writeJpegToFile("/Users/user/Desktop/test.jpg", data, 16, 16);
+    JpegCodec::writeJpegToFile("/Users/user/Desktop/test.jpg", data, w, h);
     printData(data.first);
     std::cout << data.second;
 
