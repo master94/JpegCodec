@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #include "bitmap.h"
 #include "jpegcodec.h"
@@ -21,17 +22,27 @@ void printData(const std::vector<int> &data)
 
 int main()
 {
-    Bitmap b(16, 16);
+    const int w = 8;
+    const int h = 8;
+
+    Bitmap b(w, h);
     for (int i = 0; i < b.height(); ++i) {
         for (int j = 0; j < b.width(); ++j) {
-            if (~(i + j) & 1) {
-                b.setPixel(j, i, Pixel(255, 255, 255));
-            }
+            /*int v = 0;
+            if (i >= 8 && j < 8)
+                v = 175;
+            else if (i < 8 && j >= 8)
+                v = 100;
+            else if (i >= 8 && j >= 8)
+                v = 255;*/
+
+            if ((i + j) & 1)
+            b.setPixel(j, i, Pixel(255, 255, 255));
         }
     }
 
     std::pair<std::vector<int>, int> data = JpegCodec::encode(b);
-    JpegCodec::writeJpegToFile("/Users/user/Desktop/test.jpg", data, 16, 16);
+    JpegCodec::writeJpegToFile("/Users/user/Desktop/test.jpg", data, w ,h);
     printData(data.first);
     std::cout << data.second;
 

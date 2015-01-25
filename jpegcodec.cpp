@@ -197,8 +197,10 @@ void JpegCodec::dct(char *data, int width, int height, BitDataBuilder &builder)
     int intBuffer1[bufferSize];
     int intBuffer2[bufferSize];
 
-    for (int i = 0; i < ceil(height / blockSize); ++i) {
-        for (int j = 0; j < ceil(width / blockSize); ++j) {
+    int prevDc = 0;
+
+    for (int i = 0; i < ceil(float(height) / blockSize); ++i) {
+        for (int j = 0; j < ceil(float(width) / blockSize); ++j) {
             memset(byteBuffer, 0, bufferSize);
 
             for (int k = 0; k < blockSize; ++k) {
@@ -222,13 +224,14 @@ void JpegCodec::dct(char *data, int width, int height, BitDataBuilder &builder)
 
             const int len = runLengthEncoding(intBuffer1, intBuffer2, blockSize);
 
-            for (int a = 0; a < len; ++a) {
+            /*for (int a = 0; a < len; ++a) {
                 std::cout << intBuffer2[a] << " ";
             }
-            std::cout << std::endl;
+            std::cout << std::endl;*/
 
             const int dcCodeLength = codeLength(intBuffer2[0]);
-            int data =  intBuffer2[0];
+            int data =  intBuffer2[0] - prevDc;
+            prevDc = intBuffer2[0];
             if (data < 0)
                 data = ~(-data);
 
@@ -362,8 +365,8 @@ void JpegCodec::writeJpegToFile(const char *filename, const std::pair<std::vecto
     out << char(0xff) << char(0xc0); // SOF
     out << char(0x00) << char(0x0b);
     out << char(0x08); // 8bit sample
-    out << char(0x00) << char(0x10); // height
-    out << char(0x00) << char(0x10); // width
+    out << char(0x00) << char(height); // height
+    out << char(0x00) << char(width); // width
     out << char(0x01); // only gray channel
     out << char(0x01) << char(0x11) << char(0x00); // gray channel data*/
 
