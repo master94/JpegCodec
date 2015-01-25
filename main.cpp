@@ -22,26 +22,40 @@ void printData(const std::vector<int> &data)
 
 int main()
 {
-    const int w = 8;
-    const int h = 8;
+    const int w = 12;
+    const int h = 12;
 
-    Bitmap b(w, h);
-    for (int i = 0; i < b.height(); ++i) {
-        for (int j = 0; j < b.width(); ++j) {
-            /*int v = 0;
+    int sum = 0;
+    Bitmap bmp(w, h);
+    for (int i = 0; i < bmp.height(); ++i) {
+        for (int j = 0; j < bmp.width(); ++j) {
+            int v = 0;
             if (i >= 8 && j < 8)
                 v = 175;
             else if (i < 8 && j >= 8)
                 v = 100;
             else if (i >= 8 && j >= 8)
-                v = 255;*/
+                v = 255;
 
-            if ((i + j) & 1)
-            b.setPixel(j, i, Pixel(255, 255, 255));
+            bmp.setPixel(j, i, Pixel(v, v, v));
+
+            /*if (~(i + j) & 1) {
+                bmp.setPixel(j, i, Pixel(255, 255, 255));
+                sum++;
+            }*/
         }
     }
 
-    std::pair<std::vector<int>, int> data = JpegCodec::encode(b);
+    /*for (int i = 0; i < bmp.height(); ++i) {
+        for (int j = 0; j < bmp.width(); ++j) {
+            std::cout << int(bmp.data()[i * w + j].red()) << " ";
+        }
+        std::cout << std::endl;
+    }*/
+
+    std::cout << "SUM " << sum << std::endl;
+
+    std::pair<std::vector<int>, int> data = JpegCodec::encode(bmp);
     JpegCodec::writeJpegToFile("/Users/user/Desktop/test.jpg", data, w ,h);
     printData(data.first);
     std::cout << data.second;
