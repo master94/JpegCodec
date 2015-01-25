@@ -197,9 +197,13 @@ void JpegCodec::dct(char *data, int width, int height, BitDataBuilder &builder)
     int intBuffer1[bufferSize];
     int intBuffer2[bufferSize];
 
-    for (int i = 0; i < ceil(height / blockSize); ++i) {
-        for (int j = 0; j < ceil(width / blockSize); ++j) {
+    int prevDc = 0;
+
+    for (int i = 0; i < ceil(float(height) / blockSize); ++i) {
+        for (int j = 0; j < ceil(float(width) / blockSize); ++j) {
             memset(byteBuffer, 0, bufferSize);
+            memset(intBuffer1, 0, bufferSize);
+            memset(intBuffer2, 0, bufferSize);
 
             for (int k = 0; k < blockSize; ++k) {
                 if (i * blockSize + k >= height)
@@ -208,6 +212,9 @@ void JpegCodec::dct(char *data, int width, int height, BitDataBuilder &builder)
                 const int pos = (i * blockSize + k) * width + j * blockSize;
                 const int copySize = fmin(blockSize, width - j * blockSize);
                 memcpy(byteBuffer + blockSize * k, data + pos, copySize);
+
+                if (copySize < blockSize)
+                    memset(byteBuffer + blockSize * k + copySize, byteBuffer[blockSize * k + copySize], blockSize - copySize);
             }
 
             dctBlock(byteBuffer, intBuffer1, blockSize);
@@ -227,8 +234,9 @@ void JpegCodec::dct(char *data, int width, int height, BitDataBuilder &builder)
             }
             std::cout << std::endl;
 
-            const int dcCodeLength = codeLength(intBuffer2[0]);
-            int data =  intBuffer2[0];
+            int data =  intBuffer2[0] - prevDc;
+            prevDc = intBuffer2[0];
+            const int dcCodeLength = codeLength(data);
             if (data < 0)
                 data = ~(-data);
 
@@ -259,7 +267,7 @@ void JpegCodec::quantizeBlock(int *data, int blockSize)
 
     for (int i = 0; i < 8; ++i) {
         for (int j = 0; j < 8; ++j) {
-            data[i * blockSize + j] = round(data[i * blockSize + j] / quantTable[i * blockSize + j]);
+            data[i * blockSize + j] = int(data[i * blockSize + j] / quantTable[i * blockSize + j]);
         }
     }
 }

@@ -33,7 +33,7 @@ void Bitmap::setPixel(int x, int y, const Pixel &pixel)
     if (!isValid() || x < 0 || x >= m_width || y < 0 || y >= m_height)
         return;
 
-    m_data[x * m_width + y] = pixel;
+    m_data[y * m_width + x] = pixel;
 }
 
 Pixel Bitmap::pixel(int x, int y) const
