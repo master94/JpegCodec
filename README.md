@@ -1,0 +1,2 @@
+# JpegCodec
+Simple JPEG encoder.
